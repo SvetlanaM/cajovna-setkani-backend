@@ -1,0 +1,34 @@
+klingerka.xs:
+  label: xs
+  mediaQuery: '(min-width: 0px)'
+  weight: 0
+  multipliers:
+    - 1x
+
+klingerka.sm:
+  label: sm
+  mediaQuery: '(min-width: 576px)'
+  weight: 1
+  multipliers:
+    - 1x      
+
+klingerka.md:
+  label: md
+  mediaQuery: '(min-width: 768px)'
+  weight: 2
+  multipliers:
+    - 1x    
+    
+klingerka.lg:
+  label: lg
+  mediaQuery: '(min-width: 992px)'
+  weight: 3
+  multipliers:
+    - 1x       
+
+klingerka.xl:
+  label: xl
+  mediaQuery: '(min-width: 1200px)'
+  weight: 4
+  multipliers:
+    - 1x    
