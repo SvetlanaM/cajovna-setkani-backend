@@ -1,0 +1,7 @@
+name: 'Webform For Booking Seats'
+type: module
+description: 'Provides the webform validation handler for controlling of seats booking.'
+core: 8.x
+package: 'Webform'
+dependencies:
+  - 'webform:webform_node'

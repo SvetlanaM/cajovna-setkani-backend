@@ -1,0 +1,153 @@
+<?php
+
+/**
+ * @file
+ * Contains nanooq_it_webform_booking.module.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Database\Database;
+
+use Drupal\block\Entity\Block;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\node\NodeInterface;
+use Drupal\Core\Access\AccessResult;
+
+/**
+ * Implements hook_block_access().
+ */
+function nanooq_it_webform_booking_block_access(Block $block, $operation, AccountInterface $account) {
+
+  $node = \Drupal::routeMatch()->getParameter('node');
+
+  $form_exists = FALSE;
+
+  if ($node instanceof NodeInterface) {
+    if ($node->hasField('field_capacity')) {
+      if (!$node->get('field_capacity')->isEmpty()) {
+        $form_exists = TRUE;
+      }
+    }
+  }
+
+  $event_active = TRUE;
+
+  if ($node instanceof NodeInterface) {
+    if ($node->hasField('field_from')) {
+      if (!$node->get('field_from')->isEmpty()) {
+        if(strtotime($node->field_from->value) < strtotime(date("Y-m-d H:i:s")) ) {
+            $event_active = FALSE;
+        }
+      }
+    }
+  }
+
+  if ($operation == 'view' && $block->getPluginId() == 'webform_block') {
+    return AccessResult::forbiddenIf($form_exists == FALSE or $event_active == FALSE)->addCacheableDependency($block);
+  }
+
+  return AccessResult::neutral();
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function nanooq_it_webform_booking_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+
+  $nid = \Drupal::routeMatch()->getRawParameter('node');
+  $webform_id = 'webform_submission_akce_node_' . $nid . '_add_form';;
+
+  if ($form_id != $webform_id) {
+    return;
+  }
+
+  $node = \Drupal::routeMatch()->getParameter('node');
+  $available_seats_number = (int) $node->field_capacity->value;
+
+  $form['#validate'][] = 'nanooq_it_webform_booking_validate';
+
+    $node_id = $node->nid->value;
+    $database = \Drupal::database();
+    $query = $database->query("SELECT (SELECT sum(value) FROM {webform_submission_data} where name = 'pocet_osob') AS {a} FROM {webform_submission_data} where value = $node_id group by {a}");
+    $result = $query->fetchAll();
+
+    foreach ($result as $obj)
+    {
+        $fin_available_seats_number = $available_seats_number - (int) $obj->a;
+
+        if ($fin_available_seats_number == 0) {
+            print '<div class="event-available-num">'.t('Event is fully booked. If you have any questions, please contact us on <strong><a href="mailto:oron@volny.cz">oron@volny.cz</a></strong> or <strong><a href="tel:00420603436262">+420 603 436 262</a></strong>').'</div>';
+            $form['elements']['#access'] = FALSE;
+        } elseif ($fin_available_seats_number > 0) {
+            print '<div class="event-available-num">'.t('Book your event, remaining seats:')." {$fin_available_seats_number}</div>";
+        }
+    }
+
+}
+
+
+/**
+ * Custom webform validator.
+ *
+ * While the page was open, seats could be reserved by someone else.
+ * Therefore check how many seats are available.
+ */
+function nanooq_it_webform_booking_validate(&$form, FormStateInterface $form_state) {
+
+  $node = \Drupal::routeMatch()->getParameter('node');
+
+  $available_seats_number = (int) $node->field_capacity->value;
+
+  $element = $form['elements']['pocet_osob'];
+
+  $node_id = $node->nid->value;
+  $database = \Drupal::database();
+  $query = $database->query("SELECT (SELECT sum(value) FROM {webform_submission_data} where name = 'pocet_osob') AS {a} FROM {webform_submission_data} where value = $node_id group by {a}");
+  $result = $query->fetchAll();
+
+  foreach ($result as $obj)
+  {
+      $fin_available_seats_number = $available_seats_number - (int) $obj->a;
+  }
+
+  if ($fin_available_seats_number === 0) {
+
+    $message = t('Sorry, but all seats are already booked.');
+    $form_state->setError($element, $message);
+    $form['elements']['#access'] = FALSE;
+    return;
+  }
+
+  $requested_seats_number = (int) $form_state->getValue('pocet_osob');
+  //echo t('Requested seats number: '.$requested_seats_number.'<br />');
+
+  if ($requested_seats_number > $fin_available_seats_number) {
+
+    $message = t('Sorry, but only @number seats are available.', ['@number' => $fin_available_seats_number]);
+    $form_state->setError($element, $message);
+    return;
+  }
+
+  // Reduce the number of available seats and update the field value.
+  //$available_seats_number = $available_seats_number - $requested_seats_number;
+  //$node->set('field_available_capacity', $available_seats_number);
+  //$node->save();
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for node templates.
+ *
+ * Hide the field with the webform if all seats are booked.
+ */
+/*
+function nanooq_it_webform_booking_preprocess_node__representation(&$variables) {
+
+  if (!isset($variables['elements']['field_capacity'])) {
+    return;
+  }
+  // If there are no available seats then hide the webform.
+  if ($variables['elements']['field_capacity'][0]['#markup'] == '0') {
+    unset($variables['content']['field_nanooq_it_webform_booking']);
+  }
+}
+*/

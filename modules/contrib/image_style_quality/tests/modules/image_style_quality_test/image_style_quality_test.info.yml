@@ -1,0 +1,14 @@
+name: Image Style Quality Test
+type: module
+description: 'Test config for image style quality.'
+# core: 8.x
+package: Media
+# version: VERSION
+dependencies:
+  - image
+
+# Information added by Drupal.org packaging script on 2015-10-10
+version: '8.x-1.3'
+core: '8.x'
+project: 'image_style_quality'
+datestamp: 1444452841

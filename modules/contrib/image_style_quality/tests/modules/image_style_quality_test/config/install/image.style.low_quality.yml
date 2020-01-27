@@ -1,0 +1,15 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - image_style_quality
+name: low_quality
+label: 'Low Quality'
+effects:
+  2643234d-ac74-4b71-9c2c-449f6dfe4aaa:
+    uuid: 2643234d-ac74-4b71-9c2c-449f6dfe4aaa
+    id: image_style_quality
+    weight: 1
+    data:
+      quality: 10
+

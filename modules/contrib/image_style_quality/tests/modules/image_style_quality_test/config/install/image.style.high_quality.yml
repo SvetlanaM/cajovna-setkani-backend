@@ -1,0 +1,15 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - image_style_quality
+name: high_quality
+label: 'High Quality'
+effects:
+  81c52762-e91e-4bf5-8f00-f1ec0a1ed025:
+    uuid: 81c52762-e91e-4bf5-8f00-f1ec0a1ed025
+    id: image_style_quality
+    weight: 1
+    data:
+      quality: 100
+
