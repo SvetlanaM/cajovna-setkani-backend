@@ -1,34 +1,34 @@
-klingerka.xs:
+cajovnasetkani.xs:
   label: xs
   mediaQuery: '(min-width: 0px)'
   weight: 0
   multipliers:
     - 1x
 
-klingerka.sm:
+cajovnasetkani.sm:
   label: sm
   mediaQuery: '(min-width: 576px)'
   weight: 1
   multipliers:
-    - 1x      
+    - 1x
 
-klingerka.md:
+cajovnasetkani.md:
   label: md
   mediaQuery: '(min-width: 768px)'
   weight: 2
   multipliers:
-    - 1x    
-    
-klingerka.lg:
+    - 1x
+
+cajovnasetkani.lg:
   label: lg
   mediaQuery: '(min-width: 992px)'
   weight: 3
   multipliers:
-    - 1x       
+    - 1x
 
-klingerka.xl:
+cajovnasetkani.xl:
   label: xl
   mediaQuery: '(min-width: 1200px)'
   weight: 4
   multipliers:
-    - 1x    
+    - 1x
