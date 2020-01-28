@@ -63,17 +63,37 @@ function nanooq_it_webform_booking_form_alter(&$form, FormStateInterface $form_s
 
   $node = \Drupal::routeMatch()->getParameter('node');
   $available_seats_number = (int) $node->field_capacity->value;
+  $fin_available_seats_number = $available_seats_number;
+
+
 
   $form['#validate'][] = 'nanooq_it_webform_booking_validate';
 
+
     $node_id = $node->nid->value;
+
     $database = \Drupal::database();
-    $query = $database->query("SELECT (SELECT sum(value) FROM {webform_submission_data} where name = 'pocet_osob') AS {a} FROM {webform_submission_data} where value = $node_id group by {a}");
+
+    $query1 = $database->query("SELECT event_id as {b} FROM {event_submissions} where event_id = $node_id");
+    $result1 = $query1->fetchAll();
+
+    $event_exists = count($result1);
+
+    if ($event_exists === 0) {
+    $database->insert('event_submissions')
+    ->fields([
+      'event_id' => $node_id,
+      'number_of_available' => $available_seats_number,
+    ])
+    ->execute();
+} else {
+    $query = $database->query("SELECT sum(number_of_person) as {a} FROM {event_submissions} where event_id = $node_id");
     $result = $query->fetchAll();
 
     foreach ($result as $obj)
     {
         $fin_available_seats_number = $available_seats_number - (int) $obj->a;
+
 
         if ($fin_available_seats_number == 0) {
             print '<div class="event-available-num">'.t('Event is fully booked. If you have any questions, please contact us on <strong><a href="mailto:oron@volny.cz">oron@volny.cz</a></strong> or <strong><a href="tel:00420603436262">+420 603 436 262</a></strong>').'</div>';
@@ -82,6 +102,7 @@ function nanooq_it_webform_booking_form_alter(&$form, FormStateInterface $form_s
             print '<div class="event-available-num">'.t('Book your event, remaining seats:')." {$fin_available_seats_number}</div>";
         }
     }
+}
 
 }
 
@@ -102,12 +123,30 @@ function nanooq_it_webform_booking_validate(&$form, FormStateInterface $form_sta
 
   $node_id = $node->nid->value;
   $database = \Drupal::database();
-  $query = $database->query("SELECT (SELECT sum(value) FROM {webform_submission_data} where name = 'pocet_osob') AS {a} FROM {webform_submission_data} where value = $node_id group by {a}");
+
+  $requested_seats_number = (int) $form_state->getValue('pocet_osob');
+
+
+
+
+
+
+  $query = $database->query("SELECT sum(number_of_person) as {a} FROM {event_submissions} where event_id = $node_id");
   $result = $query->fetchAll();
+
 
   foreach ($result as $obj)
   {
       $fin_available_seats_number = $available_seats_number - (int) $obj->a;
+      if ($requested_seats_number <= $fin_available_seats_number) {
+      $database->insert('event_submissions')
+      ->fields([
+        'number_of_person' => $requested_seats_number,
+        'event_id' => $node_id,
+        'number_of_available' => $available_seats_number,
+      ])
+      ->execute();
+  }
   }
 
   if ($fin_available_seats_number === 0) {
@@ -115,18 +154,21 @@ function nanooq_it_webform_booking_validate(&$form, FormStateInterface $form_sta
     $message = t('Sorry, but all seats are already booked.');
     $form_state->setError($element, $message);
     $form['elements']['#access'] = FALSE;
-    return;
-  }
 
-  $requested_seats_number = (int) $form_state->getValue('pocet_osob');
-  //echo t('Requested seats number: '.$requested_seats_number.'<br />');
+    return;
+}
 
   if ($requested_seats_number > $fin_available_seats_number) {
 
     $message = t('Sorry, but only @number seats are available.', ['@number' => $fin_available_seats_number]);
     $form_state->setError($element, $message);
     return;
-  }
+}
+
+
+  //echo t('Requested seats number: '.$requested_seats_number.'<br />');
+
+
 
   // Reduce the number of available seats and update the field value.
   //$available_seats_number = $available_seats_number - $requested_seats_number;
