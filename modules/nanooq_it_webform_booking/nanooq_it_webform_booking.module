@@ -167,3 +167,4 @@ function nanooq_it_webform_booking_validate(&$form, FormStateInterface $form_sta
     $form_state->setError($element, $message);
     return;
 }
+}
