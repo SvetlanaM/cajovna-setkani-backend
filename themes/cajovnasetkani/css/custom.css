@@ -664,10 +664,6 @@ body.path-user .main-content {
     padding-right: 10px;
 }
 
-.node--type-article .field--name-field-from {}
-
-.node--type-article .field--name-field-to {}
-
 .node--type-article .field--name-field-image {
     margin-top: 20px;
 }
@@ -678,32 +674,28 @@ body.path-user .main-content {
     margin-top: 20px;
 }
 
+.node--type-article .main-content > .section {
+    position: relative;
+}
+
 @media (min-width: 768px) {
     #block-views-block-add-event-to-calendar-block-1,
-    .view-events .view-content > .item-list > ul > li .views-field.views-field-nothing {
+    .view-events .view-content > .item-list > ul > li .views-field.views-field-nothing,
+    .view-events .view-content > .item-list > ul > li .views-field.views-field-view-node {
         height: 1px;
-        position: relative;
-        top: -36px;
+        position: absolute;
+        top: 0;
+        left: auto;
+        right: 0;
         width: 200px;
         margin-left: auto;
         margin-right: 0;
     }
-
-    #block-views-block-add-event-to-calendar-block-1 {
-        top: -45px;
-    }
 }
 
-
-@media (min-width: 1200px) {
-    #block-views-block-add-event-to-calendar-block-1,
-    .view-events .view-content > .item-list > ul > li .views-field.views-field-nothing {
-        top: -40px;
-    }
-
-    #block-views-block-add-event-to-calendar-block-1 {
-        top: -49px;
-    }
+.view-events .view-content > .item-list > ul > li .views-field.views-field-nothing,
+.view-events .view-content > .item-list > ul > li .views-field.views-field-view-node {
+    top: 20px;
 }
 
 .node--type-article h1.title {
@@ -713,7 +705,7 @@ body.path-user .main-content {
 @media (min-width: 768px) {
     .node--type-article h1.title,
     .view-events .view-content > .item-list > ul > li .views-field.views-field-title {
-        padding-right: 220px;
+        padding-right: 240px;
     }
 }
 
@@ -814,15 +806,17 @@ label.form-required:after {
  * Akce
  */
 .view-events .view-content > .item-list > ul > li {
+    position: relative;
     margin-top: 20px;
     margin-bottom: 20px;
     padding-top: 20px;
     padding-bottom: 20px;
+    padding-right: 0;
+    padding-right: 0;
 }
 
 .view-events .view-content > .item-list > ul > li:first-child {
     margin-top: 0;
-    padding-top: 0;
 }
 
 .view-events .view-content > .item-list > ul > li:not(:first-child) {
@@ -991,4 +985,16 @@ label.form-required:after {
  */
 .alert-wrapper {
     left: 20px;
+}
+
+
+/**
+ * Views Empty
+ */
+.view-empty {
+    padding: 40px 0;
+    margin: 0 -15px;
+    font-size: 18px;
+    line-height: 26px;
+    font-weight: 700;
 }

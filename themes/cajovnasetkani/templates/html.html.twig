@@ -41,7 +41,16 @@
 
     <js-placeholder token="{{ placeholder_token|raw }}">
     <!-- AddEvent script -->
-    <script type="text/javascript" src="https://addevent.com/libs/atc/1.6.1/atc.min.js" async defer></script>      
+    <script type="text/javascript" src="https://addevent.com/libs/atc/1.6.1/atc.min.js" async defer></script>
+
+    <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "url": "{{ url('<current>') }}",
+          "logo": "https://cajovnasetkani.cz/sites/default/files/logo_0.png"
+        }
+        </script>
 
   </head>
   <body{{ attributes.addClass(body_classes) }}>
